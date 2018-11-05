@@ -4,6 +4,14 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Luca Montanari</Authors>
+    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/thunderluca/Alexa.NET.Extensions</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/thunderluca/Alexa.NET.Extensions/blob/master/LICENSE</PackageLicenseUrl>
+    <Copyright>Copyright (c) 2018 Luca Montanari</Copyright>
+    <Description>A collection of utilities made for Alexa Skills SDK for .NET (https://github.com/timheuer/alexa-skills-dotnet)</Description>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <PackageTags>amazon;alexa;echo;dot;skills;extensions</PackageTags>
+    <RepositoryUrl>https://github.com/thunderluca/Alexa.NET.Extensions</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
