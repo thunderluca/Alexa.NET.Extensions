@@ -36,23 +36,26 @@ namespace Alexa.NET.Extensions.Types
                 value = value.Replace(GenericSegment, string.Empty);
             }
 
-            var season = seasons.FirstOrDefault(s => value.EndsWith(s.Name, StringComparison.OrdinalIgnoreCase));
-            if (season != null)
+            var segments = value.Split(SplitChar);
+            if (segments.Length == 1 && segments[0].Length == 4)
             {
-                return ParseSeason(value, season);
+                return ParseYear(segments[0]);
             }
 
-            if (value.Length == 4)
+            if (segments.Length == 2)
             {
-                return ParseYear(value);
+                var season = seasons.FirstOrDefault(s => segments.Last().Equals(s.Name, StringComparison.OrdinalIgnoreCase));
+                if (season != null)
+                {
+                    return ParseSeason(segments, season);
+                }
             }
 
-            if (DateTime.TryParseExact(value, ShortDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime date))
+            if (segments.Length == 3 && DateTime.TryParseExact(value, ShortDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime date))
             {
                 return new AmazonDate(date, date);
             }
 
-            var segments = value.Split(SplitChar);
             if (segments.Length >= 2 && segments[1].StartsWith(WeekString, StringComparison.OrdinalIgnoreCase))
             {
                 return ParseWeekOfYear(segments, useGregorianCalendar);
@@ -61,13 +64,12 @@ namespace Alexa.NET.Extensions.Types
             return ParseMonthOfYear(segments);
         }
 
-        private static AmazonDate ParseSeason(string value, Season season)
+        private static AmazonDate ParseSeason(string[] segments, Season season)
         {
             //Season
-            var yearSegment = value.Split(SplitChar).FirstOrDefault() ?? string.Empty;
-            if (!int.TryParse(yearSegment, out int year))
+            if (!int.TryParse(segments[0], out int year))
             {
-                throw new ArgumentException("Invalid year: " + yearSegment, nameof(value));
+                throw new ArgumentException("Invalid year: " + segments[0], nameof(segments));
             }
 
             var startDate = new DateTime(year, season.StartMonth, season.StartDay).AsNewUtcDateTime();
@@ -76,9 +78,9 @@ namespace Alexa.NET.Extensions.Types
             return new AmazonDate(startDate, endDate);
         }
 
-        private static AmazonDate ParseYear(string value)
+        private static AmazonDate ParseYear(string yearString)
         {
-            if (int.TryParse(value, out int year))
+            if (int.TryParse(yearString, out int year))
             {
                 //Single year
                 var startDate = new DateTime(year, 1, 1).AsNewUtcDateTime();

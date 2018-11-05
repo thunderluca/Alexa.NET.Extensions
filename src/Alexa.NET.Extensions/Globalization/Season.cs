@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -29,15 +31,24 @@ namespace Alexa.NET.Extensions.Globalization
         {
             var assembly = typeof(Season).GetTypeInfo().Assembly;
 
-            var resourceName = assembly.GetName().Name + $".Resources.{twoLetterIsoLanguage}.json";
+            var resourceName = assembly.GetName().Name + ".Resources.seasons.json";
 
             using (var resourceStream = assembly.GetManifestResourceStream(resourceName))
             {
                 using (var reader = new StreamReader(resourceStream))
                 {
-                    var json = reader.ReadToEnd();
+                    using (var jsonReader = new JsonTextReader(reader))
+                    {
+                        var jObject = JObject.Load(jsonReader);
 
-                    return JsonConvert.DeserializeObject<Season[]>(json);
+                        var value = jObject[twoLetterIsoLanguage];
+                        if (value == null)
+                        {
+                            throw new ArgumentOutOfRangeException(nameof(value), $"Not found any value with key \"{twoLetterIsoLanguage}\"");
+                        }
+
+                        return value.ToObject<Season[]>();
+                    }
                 }
             }
         }
